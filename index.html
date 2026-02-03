@@ -211,11 +211,11 @@
             <div class="input-group"><label id="txtInit">起始资金 ($)</label><input type="number" id="initVal"
                     value="10000"></div>
             <div class="input-group"><label id="txtContrib">年度定投 ($)</label><input type="number" id="annualContrib"
-                    value="2000"></div>
+                    value="0"></div>
 
             <div class="input-group">
                 <div class="checkbox-row">
-                    <input type="checkbox" id="taxEnable" checked onchange="toggleInputs()">
+                    <input type="checkbox" id="taxEnable" unchecked onchange="toggleInputs()">
                     <label id="txtTaxEnable" for="taxEnable">考虑标普利得税 (%)</label>
                 </div>
                 <input type="number" id="taxRate" value="20">
@@ -223,7 +223,7 @@
 
             <div class="input-group">
                 <div class="checkbox-row">
-                    <input type="checkbox" id="coiEnable" checked onchange="toggleInputs()">
+                    <input type="checkbox" id="coiEnable" unchecked onchange="toggleInputs()">
                     <label id="txtCOIEnable" for="coiEnable">考虑 IUL 年度成本 ($)</label>
                 </div>
                 <input type="number" id="coiRate" value="500">
