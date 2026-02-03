@@ -1,0 +1,15 @@
+{
+  "name": "S&P vs IUL Pro",
+  "short_name": "SP-IUL",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e40af",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2422/2422796.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

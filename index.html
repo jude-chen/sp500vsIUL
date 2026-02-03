@@ -1,199 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S&P 500 vs IUL Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #1e40af; --secondary: #10b981; --accent: #ef4444; --bg: #f8fafc; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #1e293b; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .input-group { display: flex; flex-direction: column; }
-        label { font-size: 0.75rem; font-weight: bold; color: #64748b; margin-bottom: 4px; }
-        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
-        .btn-row { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { flex: 1; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
-        #btnCompare { background: var(--primary); color: white; }
-        #btnSync { background: #64748b; color: white; font-size: 0.8rem; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .summary-card { padding: 15px; border-radius: 8px; border-left: 5px solid; background: #f1f5f9; }
-        .sp-card { border-left-color: var(--accent); }
-        .iul-card { border-left-color: var(--secondary); }
-        .table-wrap { overflow-x: auto; max-height: 300px; border: 1px solid #e2e8f0; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { position: sticky; top: 0; background: #f8fafc; padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
-        .chart-container { height: 350px; margin-top: 25px; }
+        :root {
+            --primary: #1e40af;
+            --secondary: #10b981;
+            --accent: #ef4444;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 10px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        #btnCompare {
+            background: var(--primary);
+            color: white;
+        }
+
+        #btnSync {
+            background: #64748b;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid;
+            background: #f1f5f9;
+        }
+
+        .sp-card {
+            border-left-color: var(--accent);
+        }
+
+        .iul-card {
+            border-left-color: var(--secondary);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            max-height: 300px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .chart-container {
+            height: 350px;
+            margin-top: 25px;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <header>
-        <h2 id="txtTitle">S&P 500 vs IUL</h2>
-        <select id="langSelect" onchange="initApp()">
-            <option value="en">English</option>
-            <option value="zh">简体中文</option>
-            <option value="zh-tw">繁體中文</option>
-        </select>
-    </header>
+    <div class="container">
+        <header>
+            <h2 id="txtTitle">S&P 500 vs IUL</h2>
+            <select id="langSelect" onchange="initApp()">
+                <option value="en">English</option>
+                <option value="zh">简体中文</option>
+                <option value="zh-tw">繁體中文</option>
+            </select>
+        </header>
 
-    <div class="controls">
-        <div class="input-group"><label id="txtStart">Start</label><input type="number" id="startYear" value="1995"></div>
-        <div class="input-group"><label id="txtEnd">End</label><input type="number" id="endYear" value="2025"></div>
-        <div class="input-group"><label id="txtFloor">Floor %</label><input type="number" id="floor" value="0" step="0.5"></div>
-        <div class="input-group"><label id="txtCap">Cap %</label><input type="number" id="cap" value="12" step="0.5"></div>
-    </div>
-
-    <div class="btn-row">
-        <button id="btnSync" onclick="syncData()">🔄 Sync Data</button>
-        <button id="btnCompare" onclick="runAnalysis()">Compare Returns</button>
-    </div>
-
-    <div class="summary-grid">
-        <div class="summary-card sp-card">
-            <strong id="txtSPName">S&P 500</strong>
-            <div id="spStats">--</div>
+        <div class="controls">
+            <div class="input-group"><label id="txtStart">Start</label><input type="number" id="startYear" value="1995">
+            </div>
+            <div class="input-group"><label id="txtEnd">End</label><input type="number" id="endYear" value="2025"></div>
+            <div class="input-group"><label id="txtFloor">Floor %</label><input type="number" id="floor" value="0"
+                    step="0.5"></div>
+            <div class="input-group"><label id="txtCap">Cap %</label><input type="number" id="cap" value="12"
+                    step="0.5"></div>
         </div>
-        <div class="summary-card iul-card">
-            <strong id="txtIULName">IUL</strong>
-            <div id="iulStats">--</div>
+
+        <div class="btn-row">
+            <button id="btnSync" onclick="syncData()">🔄 Sync Data</button>
+            <button id="btnCompare" onclick="runAnalysis()">Compare Returns</button>
         </div>
+
+        <div class="summary-grid">
+            <div class="summary-card sp-card">
+                <strong id="txtSPName">S&P 500</strong>
+                <div id="spStats">--</div>
+            </div>
+            <div class="summary-card iul-card">
+                <strong id="txtIULName">IUL</strong>
+                <div id="iulStats">--</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th id="thYear">Year</th>
+                        <th id="thSP">S&P 500 %</th>
+                        <th id="thIUL">IUL %</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="chart-container"><canvas id="mainChart"></canvas></div>
     </div>
 
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th id="thYear">Year</th><th id="thSP">S&P 500 %</th><th id="thIUL">IUL %</th></tr></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+    <script>
+        let spData = {
+            1928: 43.6, 1929: -8.4, 1930: -24.9, 1931: -43.3, 1932: -8.2, 1933: 54.0, 1934: -1.4, 1935: 41.4, 1936: 27.9, 1937: -38.6, 1938: 25.2, 1939: -5.5,
+            1940: -15.3, 1941: -17.9, 1942: 12.4, 1943: 19.5, 1944: 13.8, 1945: 30.7, 1946: -11.9, 1947: 0.0, 1948: -0.7, 1949: 10.3,
+            1950: 21.8, 1951: 16.5, 1952: 11.8, 1953: -6.6, 1954: 45.0, 1955: 26.4, 1956: 2.6, 1957: -14.3, 1958: 38.1, 1959: 8.5,
+            1960: -3.0, 1961: 23.1, 1962: -11.8, 1963: 18.9, 1964: 13.0, 1965: 9.1, 1966: -13.1, 1967: 20.1, 1968: 7.7, 1969: -11.4,
+            1970: 0.1, 1971: 10.8, 1972: 15.6, 1973: -17.4, 1974: -29.7, 1975: 31.6, 1976: 19.2, 1977: -11.5, 1978: 1.1, 1979: 12.3,
+            1980: 25.8, 1981: -9.7, 1982: 14.8, 1983: 17.3, 1984: 1.4, 1985: 26.3, 1986: 14.6, 1987: 2.0, 1988: 12.4, 1989: 27.3,
+            1990: -6.6, 1991: 26.3, 1992: 4.5, 1993: 7.1, 1994: -1.5, 1995: 34.1, 1996: 20.3, 1997: 31.0, 1998: 26.7, 1999: 19.5,
+            2000: -10.1, 2001: -13.0, 2002: -23.4, 2003: 26.4, 2004: 9.0, 2005: 3.0, 2006: 13.6, 2007: 3.5, 2008: -38.5, 2009: 23.5,
+            2010: 12.8, 2011: 0.0, 2012: 13.4, 2013: 29.6, 2014: 11.4, 2015: -0.7, 2016: 9.5, 2017: 19.4, 2018: -6.2, 2019: 28.9,
+            2020: 16.3, 2021: 26.9, 2022: -19.4, 2023: 24.2, 2024: 23.3, 2025: 16.4
+        };
 
-    <div class="chart-container"><canvas id="mainChart"></canvas></div>
-</div>
+        const i18n = {
+            en: { title: "S&P 500 vs IUL", start: "Start Year", end: "End Year", floor: "Floor (%)", cap: "Cap (%)", btn: "Compare", sync: "Sync Data", year: "Year", sp: "S&P 500", iul: "IUL", total: "Total Return", cagr: "Avg Annual (CAGR)" },
+            zh: { title: "标普500与IUL对比", start: "开始年份", end: "结束年份", floor: "保底 (%)", cap: "封顶 (%)", btn: "计算对比", sync: "同步数据", year: "年份", sp: "标普500", iul: "IUL回报", total: "总回报", cagr: "年化 (CAGR)" },
+            "zh-tw": { title: "標普500與IUL對比", start: "開始年份", end: "結束年份", floor: "保底 (%)", cap: "封頂 (%)", btn: "計算對比", sync: "同步數據", year: "年份", sp: "標普500", iul: "IUL回報", total: "總回報", cagr: "年化 (CAGR)" }
+        };
 
-<script>
-let spData = {
-    1928:43.6, 1929:-8.4, 1930:-24.9, 1931:-43.3, 1932:-8.2, 1933:54.0, 1934:-1.4, 1935:41.4, 1936:27.9, 1937:-38.6, 1938:25.2, 1939:-5.5,
-    1940:-15.3, 1941:-17.9, 1942:12.4, 1943:19.5, 1944:13.8, 1945:30.7, 1946:-11.9, 1947:0.0, 1948:-0.7, 1949:10.3,
-    1950:21.8, 1951:16.5, 1952:11.8, 1953:-6.6, 1954:45.0, 1955:26.4, 1956:2.6, 1957:-14.3, 1958:38.1, 1959:8.5,
-    1960:-3.0, 1961:23.1, 1962:-11.8, 1963:18.9, 1964:13.0, 1965:9.1, 1966:-13.1, 1967:20.1, 1968:7.7, 1969:-11.4,
-    1970:0.1, 1971:10.8, 1972:15.6, 1973:-17.4, 1974:-29.7, 1975:31.6, 1976:19.2, 1977:-11.5, 1978:1.1, 1979:12.3,
-    1980:25.8, 1981:-9.7, 1982:14.8, 1983:17.3, 1984:1.4, 1985:26.3, 1986:14.6, 1987:2.0, 1988:12.4, 1989:27.3,
-    1990:-6.6, 1991:26.3, 1992:4.5, 1993:7.1, 1994:-1.5, 1995:34.1, 1996:20.3, 1997:31.0, 1998:26.7, 1999:19.5,
-    2000:-10.1, 2001:-13.0, 2002:-23.4, 2003:26.4, 2004:9.0, 2005:3.0, 2006:13.6, 2007:3.5, 2008:-38.5, 2009:23.5,
-    2010:12.8, 2011:0.0, 2012:13.4, 2013:29.6, 2014:11.4, 2015:-0.7, 2016:9.5, 2017:19.4, 2018:-6.2, 2019:28.9,
-    2020:16.3, 2021:26.9, 2022:-19.4, 2023:24.2, 2024:23.3, 2025:16.4
-};
+        let chart = null;
 
-const i18n = {
-    en: { title:"S&P 500 vs IUL", start:"Start Year", end:"End Year", floor:"Floor (%)", cap:"Cap (%)", btn:"Compare", sync:"Sync Data", year:"Year", sp:"S&P 500", iul:"IUL", total:"Total Return", cagr:"Avg Annual (CAGR)" },
-    zh: { title:"标普500与IUL对比", start:"开始年份", end:"结束年份", floor:"保底 (%)", cap:"封顶 (%)", btn:"计算对比", sync:"同步数据", year:"年份", sp:"标普500", iul:"IUL回报", total:"总回报", cagr:"年化 (CAGR)" },
-    "zh-tw": { title:"標普500與IUL對比", start:"開始年份", end:"結束年份", floor:"保底 (%)", cap:"封頂 (%)", btn:"計算對比", sync:"同步數據", year:"年份", sp:"標普500", iul:"IUL回報", total:"總回報", cagr:"年化 (CAGR)" }
-};
-
-let chart = null;
-
-function initApp() {
-    const l = i18n[document.getElementById('langSelect').value];
-    document.getElementById('txtTitle').innerText = l.title;
-    document.getElementById('txtStart').innerText = l.start;
-    document.getElementById('txtEnd').innerText = l.end;
-    document.getElementById('txtFloor').innerText = l.floor;
-    document.getElementById('txtCap').innerText = l.cap;
-    document.getElementById('btnCompare').innerText = l.btn;
-    document.getElementById('btnSync').innerText = "🔄 " + l.sync;
-    document.getElementById('thYear').innerText = l.year;
-    document.getElementById('thSP').innerText = l.sp + " %";
-    document.getElementById('thIUL').innerText = l.iul + " %";
-    runAnalysis();
-}
-
-async function syncData() {
-    const btn = document.getElementById('btnSync');
-    btn.disabled = true;
-    try {
-        // Using a public API with no CORS restrictions for recent years
-        const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^GSPC?interval=1d&range=5y'));
-        const json = JSON.parse((await res.json()).contents);
-        const quotes = json.chart.result[0].indicators.quote[0].close;
-        const stamps = json.chart.result[0].timestamp;
-        
-        // Very basic logic to find year-end prices and update spData
-        stamps.forEach((s, i) => {
-            const date = new Date(s * 1000);
-            if (date.getMonth() === 11 && date.getDate() >= 28) {
-                // Simplified: In a real app, you'd calculate YoY % correctly here
-                console.log("Found year end for", date.getFullYear());
-            }
-        });
-        alert("Sync simulated! (Note: Real-time price returns require specialized API keys for accuracy).");
-    } catch (e) {
-        alert("Offline mode: Using internal data.");
-    }
-    btn.disabled = false;
-}
-
-function runAnalysis() {
-    const start = parseInt(document.getElementById('startYear').value);
-    const end = parseInt(document.getElementById('endYear').value);
-    const floor = parseFloat(document.getElementById('floor').value);
-    const cap = parseFloat(document.getElementById('cap').value);
-    const lang = i18n[document.getElementById('langSelect').value];
-
-    let spVal = 100, iulVal = 100, years = [start - 1], spPoints = [100], iulPoints = [100];
-    const body = document.getElementById('tableBody');
-    body.innerHTML = '';
-
-    for (let y = start; y <= end; y++) {
-        if (spData[y] === undefined) continue;
-        const sRet = spData[y];
-        const iRet = Math.max(floor, Math.min(cap, sRet));
-        
-        spVal *= (1 + sRet / 100);
-        iulVal *= (1 + iRet / 100);
-        
-        years.push(y);
-        spPoints.push(spVal.toFixed(2));
-        iulPoints.push(iulVal.toFixed(2));
-        body.innerHTML += `<tr><td>${y}</td><td>${sRet}%</td><td>${iRet}%</td></tr>`;
-    }
-
-    const n = years.length - 1;
-    const spCAGR = (Math.pow(spVal/100, 1/n)-1)*100;
-    const iulCAGR = (Math.pow(iulVal/100, 1/n)-1)*100;
-
-    document.getElementById('spStats').innerHTML = `${lang.total}: ${(spVal-100).toFixed(1)}%<br>${lang.cagr}: ${spCAGR.toFixed(2)}%`;
-    document.getElementById('iulStats').innerHTML = `${lang.total}: ${(iulVal-100).toFixed(1)}%<br>${lang.cagr}: ${iulCAGR.toFixed(2)}%`;
-
-    renderChart(years, spPoints, iulPoints);
-}
-
-function renderChart(labels, sp, iul) {
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    if (chart) chart.destroy();
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                { label: 'S&P 500 ($)', data: sp, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 },
-                { label: 'IUL ($)', data: iul, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            scales: { y: { ticks: { callback: v => '$' + v } } }
+        function initApp() {
+            const l = i18n[document.getElementById('langSelect').value];
+            document.getElementById('txtTitle').innerText = l.title;
+            document.getElementById('txtStart').innerText = l.start;
+            document.getElementById('txtEnd').innerText = l.end;
+            document.getElementById('txtFloor').innerText = l.floor;
+            document.getElementById('txtCap').innerText = l.cap;
+            document.getElementById('btnCompare').innerText = l.btn;
+            document.getElementById('btnSync').innerText = "🔄 " + l.sync;
+            document.getElementById('thYear').innerText = l.year;
+            document.getElementById('thSP').innerText = l.sp + " %";
+            document.getElementById('thIUL').innerText = l.iul + " %";
+            runAnalysis();
         }
-    });
-}
 
-initApp();
-</script>
+        async function syncData() {
+            const btn = document.getElementById('btnSync');
+            btn.disabled = true;
+            try {
+                // Using a public API with no CORS restrictions for recent years
+                const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/^GSPC?interval=1d&range=5y'));
+                const json = JSON.parse((await res.json()).contents);
+                const quotes = json.chart.result[0].indicators.quote[0].close;
+                const stamps = json.chart.result[0].timestamp;
+
+                // Very basic logic to find year-end prices and update spData
+                stamps.forEach((s, i) => {
+                    const date = new Date(s * 1000);
+                    if (date.getMonth() === 11 && date.getDate() >= 28) {
+                        // Simplified: In a real app, you'd calculate YoY % correctly here
+                        console.log("Found year end for", date.getFullYear());
+                    }
+                });
+                alert("Sync simulated! (Note: Real-time price returns require specialized API keys for accuracy).");
+            } catch (e) {
+                alert("Offline mode: Using internal data.");
+            }
+            btn.disabled = false;
+        }
+
+        function runAnalysis() {
+            const start = parseInt(document.getElementById('startYear').value);
+            const end = parseInt(document.getElementById('endYear').value);
+            const floor = parseFloat(document.getElementById('floor').value);
+            const cap = parseFloat(document.getElementById('cap').value);
+            const lang = i18n[document.getElementById('langSelect').value];
+
+            let spVal = 100, iulVal = 100, years = [start - 1], spPoints = [100], iulPoints = [100];
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+
+            for (let y = start; y <= end; y++) {
+                if (spData[y] === undefined) continue;
+                const sRet = spData[y];
+                const iRet = Math.max(floor, Math.min(cap, sRet));
+
+                spVal *= (1 + sRet / 100);
+                iulVal *= (1 + iRet / 100);
+
+                years.push(y);
+                spPoints.push(spVal.toFixed(2));
+                iulPoints.push(iulVal.toFixed(2));
+                body.innerHTML += `<tr><td>${y}</td><td>${sRet}%</td><td>${iRet}%</td></tr>`;
+            }
+
+            const n = years.length - 1;
+            const spCAGR = (Math.pow(spVal / 100, 1 / n) - 1) * 100;
+            const iulCAGR = (Math.pow(iulVal / 100, 1 / n) - 1) * 100;
+
+            document.getElementById('spStats').innerHTML = `${lang.total}: ${(spVal - 100).toFixed(1)}%<br>${lang.cagr}: ${spCAGR.toFixed(2)}%`;
+            document.getElementById('iulStats').innerHTML = `${lang.total}: ${(iulVal - 100).toFixed(1)}%<br>${lang.cagr}: ${iulCAGR.toFixed(2)}%`;
+
+            renderChart(years, spPoints, iulPoints);
+        }
+
+        function renderChart(labels, sp, iul) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'S&P 500 ($)', data: sp, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 },
+                        { label: 'IUL ($)', data: iul, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: { y: { ticks: { callback: v => '$' + v } } }
+                }
+            });
+        }
+
+        initApp();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
+    <link rel="manifest" href="manifest.json">
 </body>
+
 </html>
