@@ -216,7 +216,7 @@
             <div class="input-group">
                 <div class="checkbox-row">
                     <input type="checkbox" id="taxEnable" checked onchange="toggleInputs()">
-                    <label id="txtTaxEnable" for="taxEnable">考虑标普利得税</label>
+                    <label id="txtTaxEnable" for="taxEnable">考虑标普利得税 (%)</label>
                 </div>
                 <input type="number" id="taxRate" value="20">
             </div>
@@ -224,7 +224,7 @@
             <div class="input-group">
                 <div class="checkbox-row">
                     <input type="checkbox" id="coiEnable" checked onchange="toggleInputs()">
-                    <label id="txtCOIEnable" for="coiEnable">考虑 IUL 年度成本</label>
+                    <label id="txtCOIEnable" for="coiEnable">考虑 IUL 年度成本 ($)</label>
                 </div>
                 <input type="number" id="coiRate" value="500">
             </div>
@@ -269,9 +269,9 @@
         const spData = { 1928: 43.6, 1929: -8.4, 1930: -24.9, 1931: -43.3, 1932: -8.2, 1933: 54, 1934: -1.4, 1935: 41.4, 1936: 27.9, 1937: -38.6, 1938: 25.2, 1939: -5.5, 1940: -15.3, 1941: -17.9, 1942: 12.4, 1943: 19.5, 1944: 13.8, 1945: 30.7, 1946: -11.9, 1947: 0, 1948: -0.7, 1949: 10.3, 1950: 21.8, 1951: 16.5, 1952: 11.8, 1953: -6.6, 1954: 45, 1955: 26.4, 1956: 2.6, 1957: -14.3, 1958: 38.1, 1959: 8.5, 1960: -3, 1961: 23.1, 1962: -11.8, 1963: 18.9, 1964: 13, 1965: 9.1, 1966: -13.1, 1967: 20.1, 1968: 7.7, 1969: -11.4, 1970: 0.1, 1971: 10.8, 1972: 15.6, 1973: -17.4, 1974: -29.7, 1975: 31.6, 1976: 19.2, 1977: -11.5, 1978: 1.1, 1979: 12.3, 1980: 25.8, 1981: -9.7, 1982: 14.8, 1983: 17.3, 1984: 1.4, 1985: 26.3, 1986: 14.6, 1987: 2, 1988: 12.4, 1989: 27.3, 1990: -6.6, 1991: 26.3, 1992: 4.5, 1993: 7.1, 1994: -1.5, 1995: 34.1, 1996: 20.3, 1997: 31, 1998: 26.7, 1999: 19.5, 2000: -10.1, 2001: -13, 2002: -23.4, 2003: 26.4, 2004: 9, 2005: 3, 2006: 13.6, 2007: 3.5, 2008: -38.5, 2009: 23.5, 2010: 12.8, 2011: 0, 2012: 13.4, 2013: 29.6, 2014: 11.4, 2015: -0.7, 2016: 9.5, 2017: 19.4, 2018: -6.2, 2019: 28.9, 2020: 16.3, 2021: 26.9, 2022: -19.4, 2023: 24.2, 2024: 23.3, 2025: 16.4 };
 
         const i18n = {
-            zh: { title: "S&P 500 vs IUL 专业对比报告", start: "开始年份", end: "结束年份", floor: "保底 (%)", cap: "封顶 (%)", init: "起始资金 ($)", contrib: "年度定投 ($)", tax: "考虑标普利得税", taxRateLabel: "税率 (%)", coi: "考虑 IUL 年度成本", coiRateLabel: "年度成本 ($)", btn: "开始对比计算", pdf: "导出 PDF 报告", total: "最终总额", cagr: "复合年化", year: "年份", spVal: "标普余额", iulVal: "IUL 余额" },
-            "zh-tw": { title: "S&P 500 vs IUL 專業對比報告", start: "開始年份", end: "結束年份", floor: "保底 (%)", cap: "封頂 (%)", init: "起始資金 ($)", contrib: "年度定投 ($)", tax: "考慮標普利得稅", taxRateLabel: "稅率 (%)", coi: "考慮 IUL 年度成本", coiRateLabel: "年度成本 ($)", btn: "開始對比計算", pdf: "導出 PDF 報告", total: "最終總額", cagr: "複合年化", year: "年份", spVal: "標普餘額", iulVal: "IUL 餘額" },
-            en: { title: "S&P 500 vs IUL Analysis Report", start: "Start Year", end: "End Year", floor: "Floor (%)", cap: "Cap (%)", init: "Initial ($)", contrib: "Annual Contrib ($)", tax: "Consider Tax", taxRateLabel: "Tax Rate (%)", coi: "Consider COI", coiRateLabel: "Annual Cost ($)", btn: "Run Analysis", pdf: "Export PDF", total: "Ending Balance", cagr: "CAGR", year: "Year", spVal: "S&P Balance", iulVal: "IUL Balance" }
+            zh: { title: "S&P 500 vs IUL 专业对比报告", start: "开始年份", end: "结束年份", floor: "保底 (%)", cap: "封顶 (%)", init: "起始资金 ($)", contrib: "年度定投 ($)", tax: "考虑标普利得税 (%)", taxRateLabel: "税率 (%)", coi: "考虑 IUL 年度成本 ($)", coiRateLabel: "年度成本 ($)", btn: "开始对比计算", pdf: "导出 PDF 报告", total: "最终总额", cagr: "复合年化", year: "年份", spVal: "标普余额", iulVal: "IUL 余额" },
+            "zh-tw": { title: "S&P 500 vs IUL 專業對比報告", start: "開始年份", end: "結束年份", floor: "保底 (%)", cap: "封頂 (%)", init: "起始資金 ($)", contrib: "年度定投 ($)", tax: "考慮標普利得稅 (%)", taxRateLabel: "稅率 (%)", coi: "考慮 IUL 年度成本 ($)", coiRateLabel: "年度成本 ($)", btn: "開始對比計算", pdf: "導出 PDF 報告", total: "最終總額", cagr: "複合年化", year: "年份", spVal: "標普餘額", iulVal: "IUL 餘額" },
+            en: { title: "S&P 500 vs IUL Analysis Report", start: "Start Year", end: "End Year", floor: "Floor (%)", cap: "Cap (%)", init: "Initial ($)", contrib: "Annual Contrib ($)", tax: "Consider Tax (%)", taxRateLabel: "Tax Rate (%)", coi: "Consider COI ($)", coiRateLabel: "Annual Cost ($)", btn: "Run Analysis", pdf: "Export PDF", total: "Ending Balance", cagr: "CAGR", year: "Year", spVal: "S&P Balance", iulVal: "IUL Balance" }
         };
 
         let chart = null;
