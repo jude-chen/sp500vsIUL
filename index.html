@@ -192,10 +192,11 @@
             <thead>
                 <tr>
                     <th id="thYear">年份</th>
-                    <th id="thSP">S&P 500 (原始)</th>
-                    <th id="thSPNet">S&P 500 (税后)</th>
-                    <th id="thIUL">IUL 贷记利率</th>
-                    <th id="thIULVal">IUL 账户余额 ($)</th>
+                    <th id="thSPRaw">S&P 500 (原始 %)</th>
+                    <th id="thSPNet">S&P 500 (税后 %)</th>
+                    <th id="thSPVal">S&P 500 余额 ($)</th>
+                    <th id="thIUL">IUL 利率 (%)</th>
+                    <th id="thIULVal">IUL 余额 ($)</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -236,7 +237,8 @@
             const isTaxed = document.getElementById('taxEnable').checked;
             const coi = parseFloat(document.getElementById('coiRate').value);
 
-            let spVal = 10000, iulVal = 10000; // 假设起始资金 $10,000
+            let spVal = 10000;
+            let iulVal = 10000;
             let years = [start - 1], spHistory = [10000], iulHistory = [10000];
             const body = document.getElementById('tableBody');
             body.innerHTML = '';
@@ -244,36 +246,39 @@
             for (let y = start; y <= end; y++) {
                 if (spData[y] === undefined) continue;
 
-                // S&P 500 计算
+                // --- S&P 500 计算 ---
                 let sRet = spData[y];
-                let netSRet = (isTaxed && sRet > 0) ? sRet * (1 - taxRate) : sRet;
+                // 仅对正收益征税 (简化模型：亏损年份不抵税)
+                let netSRet = (isTaxed && sRet > 0) ? (sRet * (1 - taxRate)) : sRet;
                 spVal *= (1 + netSRet / 100);
 
-                // IUL 计算
+                // --- IUL 计算 ---
                 let iRet = Math.max(floor, Math.min(cap, sRet));
                 iulVal = (iulVal * (1 + iRet / 100)) - coi;
-                if (iulVal < 0) iulVal = 0; // 避免账户变负
+                if (iulVal < 0) iulVal = 0;
 
                 years.push(y);
                 spHistory.push(spVal.toFixed(2));
                 iulHistory.push(iulVal.toFixed(2));
 
+                // 插入表格行
                 body.innerHTML += `<tr>
             <td>${y}</td>
             <td>${sRet}%</td>
             <td style="color:var(--accent)">${netSRet.toFixed(2)}%</td>
+            <td style="font-weight:bold">$${Math.round(spVal).toLocaleString()}</td>
             <td style="color:var(--secondary)">${iRet}%</td>
-            <td>$${Math.round(iulVal).toLocaleString()}</td>
+            <td style="font-weight:bold">$${Math.round(iulVal).toLocaleString()}</td>
         </tr>`;
             }
 
-            // 更新汇总
+            // 更新 CAGR 和图表
             const n = years.length - 1;
             const spCAGR = (Math.pow(spVal / 10000, 1 / n) - 1) * 100;
             const iulCAGR = (Math.pow(iulVal / 10000, 1 / n) - 1) * 100;
 
-            document.getElementById('spStats').innerHTML = `最终余额: $${Math.round(spVal).toLocaleString()}<br>复合年化: ${spCAGR.toFixed(2)}%`;
-            document.getElementById('iulStats').innerHTML = `最终余额: $${Math.round(iulVal).toLocaleString()}<br>复合年化: ${iulCAGR.toFixed(2)}%`;
+            document.getElementById('spStats').innerHTML = `最终余额: $${Math.round(spVal).toLocaleString()}<br>税后年化: ${spCAGR.toFixed(2)}%`;
+            document.getElementById('iulStats').innerHTML = `最终余额: $${Math.round(iulVal).toLocaleString()}<br>扣费后年化: ${iulCAGR.toFixed(2)}%`;
 
             drawChart(years, spHistory, iulHistory);
         }
