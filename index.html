@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S&P 500 vs IUL 专业对比系统</title>
+    <title>S&P 500 vs IUL 专业对比系统 Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -13,6 +13,7 @@
             --secondary: #10b981;
             --accent: #ef4444;
             --bg: #f8fafc;
+            --disabled: #e2e8f0;
         }
 
         body {
@@ -43,7 +44,7 @@
 
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
             background: #f1f5f9;
@@ -56,11 +57,26 @@
             flex-direction: column;
         }
 
-        label {
+        .input-group label {
             font-size: 0.75rem;
             font-weight: bold;
             color: #64748b;
             margin-bottom: 5px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .checkbox-row label {
+            margin: 0;
+            cursor: pointer;
+            color: #1e293b;
+            font-size: 0.8rem;
         }
 
         input,
@@ -69,13 +85,13 @@
             border: 1px solid #cbd5e1;
             border-radius: 6px;
             font-size: 1rem;
+            transition: all 0.2s;
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            grid-column: span 2;
+        input:disabled {
+            background-color: var(--disabled);
+            color: #94a3b8;
+            cursor: not-allowed;
         }
 
         .btn-row {
@@ -103,10 +119,6 @@
         #btnPDF {
             background: #475569;
             color: white;
-        }
-
-        button:hover {
-            opacity: 0.9;
         }
 
         .summary-grid {
@@ -147,13 +159,12 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            min-width: 700px;
+            min-width: 800px;
         }
 
         th {
             background: #f8fafc;
             padding: 12px;
-            text-align: center;
             border-bottom: 2px solid #e2e8f0;
             position: sticky;
             top: 0;
@@ -169,10 +180,6 @@
             .no-print {
                 display: none !important;
             }
-
-            .container {
-                box-shadow: none;
-            }
         }
     </style>
 </head>
@@ -182,8 +189,8 @@
     <div class="container" id="reportContent">
         <header>
             <div>
-                <h2 id="txtTitle" style="margin:0">S&P 500 vs IUL Comparison</h2>
-                <small id="txtSubtitle" style="color: #64748b;">Historical Backtest Analysis</small>
+                <h2 id="txtTitle">S&P 500 vs IUL 专业对比</h2>
+                <small id="txtSubtitle">基于 1928-2025 历史数据回测</small>
             </div>
             <select id="langSelect" class="no-print" onchange="updateUI()">
                 <option value="zh">简体中文</option>
@@ -193,25 +200,33 @@
         </header>
 
         <div class="controls no-print">
-            <div class="input-group"><label id="txtStart">开始年份</label><input type="number" id="startYear" value="2000">
-            </div>
-            <div class="input-group"><label id="txtEnd">结束年份</label><input type="number" id="endYear" value="2025">
-            </div>
+            <div class="input-group"><label id="txtStart">开始年份</label><input type="number" id="startYear" value="1995"
+                    min="1928"></div>
+            <div class="input-group"><label id="txtEnd">结束年份</label><input type="number" id="endYear" value="2025"
+                    max="2025"></div>
             <div class="input-group"><label id="txtFloor">IUL 保底 (%)</label><input type="number" id="floor" value="0">
             </div>
             <div class="input-group"><label id="txtCap">IUL 封顶 (%)</label><input type="number" id="cap" value="12">
             </div>
             <div class="input-group"><label id="txtInit">起始资金 ($)</label><input type="number" id="initVal"
                     value="10000"></div>
-            <div class="input-group"><label id="txtContrib">追加投入/年 ($)</label><input type="number" id="annualContrib"
+            <div class="input-group"><label id="txtContrib">年度定投 ($)</label><input type="number" id="annualContrib"
                     value="2000"></div>
-            <div class="input-group"><label id="txtCOI">IUL 成本/年 ($)</label><input type="number" id="coiRate"
-                    value="500"></div>
-            <div class="input-group"><label id="txtTaxRate">标普税率 (%)</label><input type="number" id="taxRate"
-                    value="20"></div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="taxEnable" checked onchange="runAnalysis()">
-                <label id="txtTaxEnable" for="taxEnable" style="cursor:pointer">S&P 500 考虑年度资本利得税</label>
+
+            <div class="input-group">
+                <div class="checkbox-row">
+                    <input type="checkbox" id="taxEnable" checked onchange="toggleInputs()">
+                    <label id="txtTaxEnable" for="taxEnable">考虑标普利得税</label>
+                </div>
+                <input type="number" id="taxRate" value="20">
+            </div>
+
+            <div class="input-group">
+                <div class="checkbox-row">
+                    <input type="checkbox" id="coiEnable" checked onchange="toggleInputs()">
+                    <label id="txtCOIEnable" for="coiEnable">考虑 IUL 年度成本</label>
+                </div>
+                <input type="number" id="coiRate" value="500">
             </div>
         </div>
 
@@ -222,11 +237,11 @@
 
         <div class="summary-grid">
             <div class="summary-card sp-card">
-                <strong id="txtSPName">S&P 500 (Taxable)</strong>
+                <strong id="txtSPName">S&P 500</strong>
                 <div id="spStats" style="margin-top:10px; line-height:1.6">--</div>
             </div>
             <div class="summary-card iul-card">
-                <strong id="txtIULName">IUL (Tax-Deferred)</strong>
+                <strong id="txtIULName">IUL 指数险</strong>
                 <div id="iulStats" style="margin-top:10px; line-height:1.6">--</div>
             </div>
         </div>
@@ -238,9 +253,9 @@
                 <thead>
                     <tr>
                         <th id="thYear">年份</th>
-                        <th id="thSPRaw">S&P 500 %</th>
+                        <th id="thSPRaw">标普 %</th>
                         <th id="thSPNet">税后 %</th>
-                        <th id="thSPVal">S&P 500 余额</th>
+                        <th id="thSPVal">标普余额</th>
                         <th id="thIUL">IUL 利率</th>
                         <th id="thIULVal">IUL 余额</th>
                     </tr>
@@ -251,16 +266,23 @@
     </div>
 
     <script>
-        // 历史数据
         const spData = { 1928: 43.6, 1929: -8.4, 1930: -24.9, 1931: -43.3, 1932: -8.2, 1933: 54, 1934: -1.4, 1935: 41.4, 1936: 27.9, 1937: -38.6, 1938: 25.2, 1939: -5.5, 1940: -15.3, 1941: -17.9, 1942: 12.4, 1943: 19.5, 1944: 13.8, 1945: 30.7, 1946: -11.9, 1947: 0, 1948: -0.7, 1949: 10.3, 1950: 21.8, 1951: 16.5, 1952: 11.8, 1953: -6.6, 1954: 45, 1955: 26.4, 1956: 2.6, 1957: -14.3, 1958: 38.1, 1959: 8.5, 1960: -3, 1961: 23.1, 1962: -11.8, 1963: 18.9, 1964: 13, 1965: 9.1, 1966: -13.1, 1967: 20.1, 1968: 7.7, 1969: -11.4, 1970: 0.1, 1971: 10.8, 1972: 15.6, 1973: -17.4, 1974: -29.7, 1975: 31.6, 1976: 19.2, 1977: -11.5, 1978: 1.1, 1979: 12.3, 1980: 25.8, 1981: -9.7, 1982: 14.8, 1983: 17.3, 1984: 1.4, 1985: 26.3, 1986: 14.6, 1987: 2, 1988: 12.4, 1989: 27.3, 1990: -6.6, 1991: 26.3, 1992: 4.5, 1993: 7.1, 1994: -1.5, 1995: 34.1, 1996: 20.3, 1997: 31, 1998: 26.7, 1999: 19.5, 2000: -10.1, 2001: -13, 2002: -23.4, 2003: 26.4, 2004: 9, 2005: 3, 2006: 13.6, 2007: 3.5, 2008: -38.5, 2009: 23.5, 2010: 12.8, 2011: 0, 2012: 13.4, 2013: 29.6, 2014: 11.4, 2015: -0.7, 2016: 9.5, 2017: 19.4, 2018: -6.2, 2019: 28.9, 2020: 16.3, 2021: 26.9, 2022: -19.4, 2023: 24.2, 2024: 23.3, 2025: 16.4 };
 
         const i18n = {
-            zh: { title: "S&P 500 vs IUL 对比报告", start: "开始年份", end: "结束年份", floor: "保底 (%)", cap: "封顶 (%)", init: "起始资金 ($)", contrib: "追加投入/年 ($)", coi: "IUL 年度成本 ($)", tax: "考虑标普利得税", taxRate: "税率 (%)", btn: "开始对比计算", pdf: "导出 PDF 报告", year: "年份", spVal: "标普余额", iulVal: "IUL 余额", total: "最终总额", cagr: "复合年化" },
-            "zh-tw": { title: "S&P 500 vs IUL 對比報告", start: "開始年份", end: "結束年份", floor: "保底 (%)", cap: "封頂 (%)", init: "起始資金 ($)", contrib: "追加投入/年 ($)", coi: "IUL 年度成本 ($)", tax: "考慮標普利得稅", taxRate: "稅率 (%)", btn: "開始對比計算", pdf: "導出 PDF 報告", year: "年份", spVal: "標普餘額", iulVal: "IUL 餘額", total: "最終總額", cagr: "複合年化" },
-            en: { title: "S&P 500 vs IUL Report", start: "Start Year", end: "End Year", floor: "Floor (%)", cap: "Cap (%)", init: "Initial Principal ($)", contrib: "Annual Contrib ($)", coi: "Annual COI ($)", tax: "Consider S&P Tax", taxRate: "Tax Rate (%)", btn: "Run Comparison", pdf: "Export PDF", year: "Year", spVal: "S&P Balance", iulVal: "IUL Balance", total: "Total Value", cagr: "CAGR" }
+            zh: { title: "S&P 500 vs IUL 专业对比报告", start: "开始年份", end: "结束年份", floor: "保底 (%)", cap: "封顶 (%)", init: "起始资金 ($)", contrib: "年度定投 ($)", tax: "考虑标普利得税", taxRateLabel: "税率 (%)", coi: "考虑 IUL 年度成本", coiRateLabel: "年度成本 ($)", btn: "开始对比计算", pdf: "导出 PDF 报告", total: "最终总额", cagr: "复合年化", year: "年份", spVal: "标普余额", iulVal: "IUL 余额" },
+            "zh-tw": { title: "S&P 500 vs IUL 專業對比報告", start: "開始年份", end: "結束年份", floor: "保底 (%)", cap: "封頂 (%)", init: "起始資金 ($)", contrib: "年度定投 ($)", tax: "考慮標普利得稅", taxRateLabel: "稅率 (%)", coi: "考慮 IUL 年度成本", coiRateLabel: "年度成本 ($)", btn: "開始對比計算", pdf: "導出 PDF 報告", total: "最終總額", cagr: "複合年化", year: "年份", spVal: "標普餘額", iulVal: "IUL 餘額" },
+            en: { title: "S&P 500 vs IUL Analysis Report", start: "Start Year", end: "End Year", floor: "Floor (%)", cap: "Cap (%)", init: "Initial ($)", contrib: "Annual Contrib ($)", tax: "Consider Tax", taxRateLabel: "Tax Rate (%)", coi: "Consider COI", coiRateLabel: "Annual Cost ($)", btn: "Run Analysis", pdf: "Export PDF", total: "Ending Balance", cagr: "CAGR", year: "Year", spVal: "S&P Balance", iulVal: "IUL Balance" }
         };
 
-        let myChart = null;
+        let chart = null;
+
+        function toggleInputs() {
+            const taxChecked = document.getElementById('taxEnable').checked;
+            const coiChecked = document.getElementById('coiEnable').checked;
+            document.getElementById('taxRate').disabled = !taxChecked;
+            document.getElementById('coiRate').disabled = !coiChecked;
+            runAnalysis(); // 实时预览效果
+        }
 
         function updateUI() {
             const l = i18n[document.getElementById('langSelect').value];
@@ -271,9 +293,8 @@
             document.getElementById('txtCap').innerText = l.cap;
             document.getElementById('txtInit').innerText = l.init;
             document.getElementById('txtContrib').innerText = l.contrib;
-            document.getElementById('txtCOI').innerText = l.coi;
-            document.getElementById('txtTaxRate').innerText = l.taxRate;
             document.getElementById('txtTaxEnable').innerText = l.tax;
+            document.getElementById('txtCOIEnable').innerText = l.coi;
             document.getElementById('btnRun').innerText = l.btn;
             document.getElementById('btnPDF').innerText = l.pdf;
             document.getElementById('thYear').innerText = l.year;
@@ -289,9 +310,12 @@
             const cap = parseFloat(document.getElementById('cap').value);
             const init = parseFloat(document.getElementById('initVal').value);
             const contrib = parseFloat(document.getElementById('annualContrib').value);
-            const coi = parseFloat(document.getElementById('coiRate').value);
-            const taxRate = parseFloat(document.getElementById('taxRate').value) / 100;
-            const isTaxed = document.getElementById('taxEnable').checked;
+
+            const taxEnabled = document.getElementById('taxEnable').checked;
+            const taxRate = taxEnabled ? parseFloat(document.getElementById('taxRate').value) / 100 : 0;
+
+            const coiEnabled = document.getElementById('coiEnable').checked;
+            const coi = coiEnabled ? parseFloat(document.getElementById('coiRate').value) : 0;
 
             let spVal = init, iulVal = init;
             let years = [start - 1], spHistory = [init], iulHistory = [init];
@@ -301,12 +325,10 @@
             for (let y = start; y <= end; y++) {
                 if (spData[y] === undefined) continue;
 
-                // 年初投入
-                spVal += contrib;
-                iulVal += contrib;
+                spVal += contrib; iulVal += contrib; // 年初定投
 
                 let sRet = spData[y];
-                let netSRet = (isTaxed && sRet > 0) ? sRet * (1 - taxRate) : sRet;
+                let netSRet = (taxEnabled && sRet > 0) ? sRet * (1 - taxRate) : sRet;
                 spVal *= (1 + netSRet / 100);
 
                 let iRet = Math.max(floor, Math.min(cap, sRet));
@@ -340,19 +362,18 @@
 
         function drawChart(labels, sp, iul) {
             const ctx = document.getElementById('mainChart').getContext('2d');
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'S&P 500 (Taxable $)', data: sp, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false },
-                        { label: 'IUL (Net Cash Value $)', data: iul, borderColor: '#10b981', borderWidth: 3, pointRadius: 0, fill: false }
+                        { label: 'S&P 500', data: sp, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0 },
+                        { label: 'IUL', data: iul, borderColor: '#10b981', borderWidth: 3, pointRadius: 0 }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     scales: { y: { ticks: { callback: v => '$' + v.toLocaleString() } } }
                 }
@@ -360,19 +381,15 @@
         }
 
         function exportPDF() {
-            const element = document.getElementById('reportContent');
             const opt = {
-                margin: 10,
-                filename: 'IUL_Vs_SP500_Report.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                margin: 10, filename: 'Wealth_Comparison_Report.pdf', image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set(opt).from(document.getElementById('reportContent')).save();
         }
 
-        // 启动初始化
         updateUI();
+        toggleInputs();
     </script>
     <script>
         if ('serviceWorker' in navigator) {
